@@ -2,6 +2,7 @@ package main;
 
 import action.Action;
 import action.Command;
+import action.Query;
 import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;
@@ -111,6 +112,8 @@ public final class Main {
         for (ActionInputData action: input.getCommands()) {
             if (action.getActionType().equals("command")) {
                 myActions.add(new Command(action, database, fileWriter, arrayResult));
+            } else if (action.getActionType().equals("query")) {
+                myActions.add(new Query(action, database, fileWriter, arrayResult));
             }
         }
 

@@ -64,7 +64,11 @@ public abstract class Action {
         return type;
     }
 
-//    public String getUsername() {
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    //    public String getUsername() {
 //        return username;
 //    }
 //

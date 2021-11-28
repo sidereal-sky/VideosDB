@@ -14,6 +14,7 @@ public class User {
     private ArrayList<String> favourite;
     private ArrayList<Movie> ratedMovies;
     private HashMap<String, ArrayList<Integer>> ratedShows;
+    private Integer numberOfRatings;
 
 
     public User(UserInputData user) {
@@ -23,38 +24,23 @@ public class User {
         this.favourite = user.getFavoriteMovies();
         ratedMovies = new ArrayList<>();
         ratedShows = new HashMap<>();
+        numberOfRatings = 0;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getSubscription() {
         return subscription;
-    }
-
-    public void setSubscription(String subscription) {
-        this.subscription = subscription;
     }
 
     public HashMap<String, Integer> getHistory() {
         return history;
     }
 
-    public void setHistory(HashMap<String, Integer> history) {
-        this.history = history;
-    }
-
     public ArrayList<String> getFavourite() {
         return favourite;
-    }
-
-    public void setFavourite(ArrayList<String> favourite) {
-        this.favourite = favourite;
     }
 
     public ArrayList<Movie> getRatedMovies() {
@@ -63,6 +49,14 @@ public class User {
 
     public HashMap<String, ArrayList<Integer>> getRatedShows() {
         return ratedShows;
+    }
+
+    public Integer getNumberOfRatings() {
+        return numberOfRatings;
+    }
+
+    public void setNumberOfRatings(Integer numberOfRatings) {
+        this.numberOfRatings = numberOfRatings;
     }
 
     @Override

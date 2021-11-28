@@ -17,6 +17,7 @@ public abstract class Video {
         this.cast = video.getCast();
     }
 
+
     public String getTitle() {
         return title;
     }
@@ -31,5 +32,19 @@ public abstract class Video {
 
     public ArrayList<String> getCast() {
         return cast;
+    }
+
+    public Double CalculateRating() {
+        return 0.0;
+    }
+
+    @Override
+    public String toString() {
+        return "Video{" +
+                "title='" + title + '\'' +
+                ", year=" + year +
+                ", genres=" + genres +
+                ", cast=" + cast +
+                '}';
     }
 }

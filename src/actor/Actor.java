@@ -7,11 +7,8 @@ import java.util.Map;
 
 public class Actor {
     private String name;
-
     private String careerDescription;
-
     private ArrayList<String> filmography;
-
     private Map<ActorsAwards, Integer> awards;
 
     public Actor(ActorInputData actor) {

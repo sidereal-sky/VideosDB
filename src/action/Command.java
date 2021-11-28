@@ -18,7 +18,8 @@ public class Command extends Action {
     private double grade;
     private int seasonNumber;
 
-    public Command(ActionInputData action, Database database, Writer output, JSONArray arrayResult) {
+    public Command(ActionInputData action, Database database, Writer output,
+				   JSONArray arrayResult) {
         super(action, database, output, arrayResult);
         this.username = action.getUsername();
         this.title = action.getTitle();
@@ -27,7 +28,6 @@ public class Command extends Action {
     }
 
     public void addFavourite(User user) {
-        System.out.println(user);
         // the user has viewed the video
         if (user.getHistory().containsKey(title)) {
             if (!user.getFavourite().contains(title)) {
@@ -57,8 +57,15 @@ public class Command extends Action {
         // the user viewed the movie and hasn't rated it yet
         if (user.getHistory().containsKey(title) && !user.getRatedMovies().contains(movie)) {
             user.getRatedMovies().add(movie);
+			user.setNumberOfRatings(user.getNumberOfRatings() + 1);
             movie.getRatings().add(grade);
-        }
+//			System.out.println(movie.getRatings().toString());
+			message = "success -> " + title + " was rated with " +
+					grade + " by " + username;
+        } else {
+			message = "error -> " + title + " is not seen";
+		}
+		writeOutput();
     }
 
     public void rateShow(User user, Show show) {
@@ -68,16 +75,22 @@ public class Command extends Action {
 			if (seasonsRated == null) {
 				seasonsRated = new ArrayList<>();
 			} else if (seasonsRated.contains(seasonNumber)) {
+				message = "error -> " + title + "has already been rated";
+				writeOutput();
 				return;
 			}
 			seasonsRated.add(seasonNumber);
 			user.getRatedShows().put(title, seasonsRated);
+			user.setNumberOfRatings(user.getNumberOfRatings() + 1);
 			// add rating to the season's list of ratings
 			show.getSeasons().get(seasonNumber - 1).getRatings().add(grade);
+			message = "success -> " + title + " was rated with " +
+					grade + " by " + username;
+		} else {
+			message = "error -> " + title + " is not seen";
 		}
+		writeOutput();
     }
-
-
 
     @Override
     public void execute(String type) {
@@ -102,10 +115,8 @@ public class Command extends Action {
 						rateShow(user, show);
 					} else {
 						rateMovie(user, movie);
+//						System.out.println(movie.getTitle() + movie.getRatings() + movie.CalculateRating());
 					}
-					message = "success -> " + title + " was rated with " +
-							grade + " by " + username;
-					writeOutput();
 				}
                 break;
         }

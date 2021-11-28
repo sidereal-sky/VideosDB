@@ -15,4 +15,18 @@ public class Movie extends Video {
     public ArrayList<Double> getRatings() {
         return ratings;
     }
+
+    @Override
+    public Double CalculateRating() {
+        if (ratings.size() == 0) {
+            return 0.0;
+        }
+        Double sum = 0.0;
+        for (Double grade: ratings) {
+            sum += grade;
+        }
+//        System.out.println(sum/ratings.size());
+        return sum/ratings.size();
+    }
+
 }
