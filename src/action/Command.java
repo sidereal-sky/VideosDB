@@ -6,80 +6,88 @@ import entertainment.Season;
 import entertainment.Show;
 import fileio.ActionInputData;
 import fileio.Writer;
+import org.json.simple.JSONArray;
 import user.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Command extends Action {
+    private String username;
+    private String title;
+    private double grade;
+    private int seasonNumber;
 
-    public Command(ActionInputData action, Database database, Writer output) {
-        super(action, database, output);
+    public Command(ActionInputData action, Database database, Writer output, JSONArray arrayResult) {
+        super(action, database, output, arrayResult);
+        this.username = action.getUsername();
+        this.title = action.getTitle();
+        this.grade = action.getGrade();
+        this.seasonNumber = action.getSeasonNumber();
     }
 
     public void addFavourite(User user) {
         System.out.println(user);
         // the user has viewed the video
-        String message;
-        if (user.getHistory().containsKey(getTitle())) {
-            if (!user.getFavourite().contains(getTitle())) {
-                user.getFavourite().add(getTitle());
-                message = "success -> " + getTitle() + "was added as favourite";
+        if (user.getHistory().containsKey(title)) {
+            if (!user.getFavourite().contains(title)) {
+                user.getFavourite().add(title);
+                message = "success -> " + title + " was added as favourite";
             } else {
-                message = "error -> " + getTitle() + " is already in favourite list";
+                message = "error -> " + title + " is already in favourite list";
             }
         } else {
-            message = "error -> " + getTitle() + " is not seen";
+            message = "error -> " + title + " is not seen";
         }
-        writeOutput(message);
-        System.out.println(user);
+        writeOutput();
     }
 
     public void viewVideo(User user) {
-        if (user.getHistory().containsKey(getTitle())) {
-            user.getHistory().put(getTitle(), user.getHistory().get(getTitle()) + 1);
+        if (user.getHistory().containsKey(title)) {
+            user.getHistory().put(title, user.getHistory().get(title) + 1);
         } else {
-            user.getHistory().put(getTitle(), 1);
+            user.getHistory().put(title, 1);
         }
-        Integer views = user.getHistory().get(getTitle());
-        String message = "success -> " + getTitle() + " was viewed with total views of " + views;
-        writeOutput(message);
+        Integer views = user.getHistory().get(title);
+        message = "success -> " + title + " was viewed with total views of " + views;
+        writeOutput();
     }
 
-    public void rateShow(User user) {
-        Show show = getDatabase().findShow(getTitle());
-        HashMap<Show, ArrayList<Integer>> ratedSeasonsMap = user.getRatedShows();
-        if (ratedSeasonsMap.isEmpty() && user.getHistory().containsKey(getTitle())) {
-            ratedSeasonsMap.put(show, new ArrayList<>());
-            ratedSeasonsMap.get(show).add(getSeasonNumber());
-        }
-        // the user viewed the show and hasn't rated that particular season yet
-        else if (user.getHistory().containsKey(getTitle()) &&
-                !ratedSeasonsMap.get(show).contains(getSeasonNumber())) {
-            // the list of seasons rated was empty
-            ratedSeasonsMap.get(show).add(getSeasonNumber());
-
-            // add rating to the getSeasonNumber-th Season's ratings list if that makes sense
-            show.getSeasons().get(getSeasonNumber()).getRatings().add(getGrade());
-        }
-    }
-
-    public void rateMovie(User user) {
-        Movie movie = getDatabase().findMovie(getTitle());
-
+    public void rateMovie(User user, Movie movie) {
         // the user viewed the movie and hasn't rated it yet
-        if (user.getHistory().containsKey(getTitle()) && !user.getRatedMovies().contains(movie)) {
+        if (user.getHistory().containsKey(title) && !user.getRatedMovies().contains(movie)) {
             user.getRatedMovies().add(movie);
-            movie.getRatings().add(getGrade());
+            movie.getRatings().add(grade);
         }
     }
+
+    public void rateShow(User user, Show show) {
+		// the user viewed the show and hasn't rated that particular season yet
+		if (user.getHistory().containsKey(title)) {
+			ArrayList<Integer> seasonsRated = user.getRatedShows().get(title);
+			if (seasonsRated == null) {
+				seasonsRated = new ArrayList<>();
+			} else if (seasonsRated.contains(seasonNumber)) {
+				return;
+			}
+			seasonsRated.add(seasonNumber);
+			user.getRatedShows().put(title, seasonsRated);
+			// add rating to the season's list of ratings
+			show.getSeasons().get(seasonNumber - 1).getRatings().add(grade);
+		}
+    }
+
+
 
     @Override
     public void execute(String type) {
-        User user = getDatabase().findUser(getUsername());
+        User user = getDatabase().findUser(username);
         if (user == null) {
             return;
         }
+		Movie movie = getDatabase().findMovie(title);
+		Show show = getDatabase().findShow(title);
+
 
         switch (type) {
             case "favorite":
@@ -88,13 +96,18 @@ public class Command extends Action {
             case "view":
                 viewVideo(user);
                 break;
-//            case "rating":
-//                if (getSeasonNumber() > 0) {
-//                    rateShow(user);
-//                } else {
-//                    rateMovie(user);
-//                }
-//                break;
+            case "rating":
+				if (movie != null || show != null) {
+                	if (seasonNumber > 0) {
+						rateShow(user, show);
+					} else {
+						rateMovie(user, movie);
+					}
+					message = "success -> " + title + " was rated with " +
+							grade + " by " + username;
+					writeOutput();
+				}
+                break;
         }
     }
 }

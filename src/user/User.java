@@ -1,8 +1,8 @@
 package user;
 
+import entertainment.Movie;
 import entertainment.Season;
 import entertainment.Show;
-import entertainment.Video;
 import fileio.UserInputData;
 
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ public class User {
     private String username, subscription;
     private HashMap<String, Integer> history;
     private ArrayList<String> favourite;
-    private ArrayList<Video> ratedMovies;
-    private HashMap<Show, ArrayList<Integer>> ratedShows;
+    private ArrayList<Movie> ratedMovies;
+    private HashMap<String, ArrayList<Integer>> ratedShows;
 
 
     public User(UserInputData user) {
@@ -57,11 +57,11 @@ public class User {
         this.favourite = favourite;
     }
 
-    public ArrayList<Video> getRatedMovies() {
+    public ArrayList<Movie> getRatedMovies() {
         return ratedMovies;
     }
 
-    public HashMap<Show, ArrayList<Integer>> getRatedShows() {
+    public HashMap<String, ArrayList<Integer>> getRatedShows() {
         return ratedShows;
     }
 

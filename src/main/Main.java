@@ -110,7 +110,7 @@ public final class Main {
         ArrayList<Action> myActions = new ArrayList<>();
         for (ActionInputData action: input.getCommands()) {
             if (action.getActionType().equals("command")) {
-                myActions.add(new Command(action, database, fileWriter));
+                myActions.add(new Command(action, database, fileWriter, arrayResult));
             }
         }
 
