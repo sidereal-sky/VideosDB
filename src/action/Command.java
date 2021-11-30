@@ -27,11 +27,16 @@ public class Command extends Action {
         this.seasonNumber = action.getSeasonNumber();
     }
 
-    public void addFavourite(User user) {
+    public void addFavourite(User user, Movie movie, Show show) {
         // the user has viewed the video
         if (user.getHistory().containsKey(title)) {
             if (!user.getFavourite().contains(title)) {
                 user.getFavourite().add(title);
+				if (movie != null) {
+					movie.setFavCount(movie.getFavCount() + 1);
+				} else if (show != null) {
+					show.setFavCount(show.getFavCount() + 1);
+				}
                 message = "success -> " + title + " was added as favourite";
             } else {
                 message = "error -> " + title + " is already in favourite list";
@@ -42,12 +47,17 @@ public class Command extends Action {
         writeOutput();
     }
 
-    public void viewVideo(User user) {
+    public void viewVideo(User user, Movie movie, Show show) {
         if (user.getHistory().containsKey(title)) {
             user.getHistory().put(title, user.getHistory().get(title) + 1);
         } else {
             user.getHistory().put(title, 1);
         }
+		if (movie != null) {
+			movie.setViewCount(movie.getViewCount() + 1);
+		} else if (show != null) {
+			show.setViewCount(show.getViewCount() + 1);
+		}
         Integer views = user.getHistory().get(title);
         message = "success -> " + title + " was viewed with total views of " + views;
         writeOutput();
@@ -55,13 +65,16 @@ public class Command extends Action {
 
     public void rateMovie(User user, Movie movie) {
         // the user viewed the movie and hasn't rated it yet
-        if (user.getHistory().containsKey(title) && !user.getRatedMovies().contains(movie)) {
-            user.getRatedMovies().add(movie);
-			user.setNumberOfRatings(user.getNumberOfRatings() + 1);
-            movie.getRatings().add(grade);
-//			System.out.println(movie.getRatings().toString());
-			message = "success -> " + title + " was rated with " +
-					grade + " by " + username;
+        if (user.getHistory().containsKey(title)) {
+			if (!user.getRatedMovies().contains(movie)) {
+				user.getRatedMovies().add(movie);
+				user.setNumberOfRatings(user.getNumberOfRatings() + 1);
+				movie.getRatings().add(grade);
+				message = "success -> " + title + " was rated with " +
+						grade + " by " + username;
+			} else {
+				message = "error -> " + title + " has been already rated";
+			}
         } else {
 			message = "error -> " + title + " is not seen";
 		}
@@ -75,7 +88,7 @@ public class Command extends Action {
 			if (seasonsRated == null) {
 				seasonsRated = new ArrayList<>();
 			} else if (seasonsRated.contains(seasonNumber)) {
-				message = "error -> " + title + "has already been rated";
+				message = "error -> " + title + " has been already rated";
 				writeOutput();
 				return;
 			}
@@ -104,10 +117,10 @@ public class Command extends Action {
 
         switch (type) {
             case "favorite":
-                addFavourite(user);
+                addFavourite(user, movie, show);
                 break;
             case "view":
-                viewVideo(user);
+                viewVideo(user, movie, show);
                 break;
             case "rating":
 				if (movie != null || show != null) {

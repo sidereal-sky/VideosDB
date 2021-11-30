@@ -34,7 +34,7 @@ public abstract class Video {
         return cast;
     }
 
-    public Double CalculateRating() {
+    public Double calculateRating() {
         return 0.0;
     }
 

@@ -4,12 +4,8 @@ import database.Database;
 import fileio.ActionInputData;
 import fileio.Writer;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import user.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class Action {
     private int actionId;
@@ -67,46 +63,6 @@ public abstract class Action {
     public void setType(String type) {
         this.type = type;
     }
-
-    //    public String getUsername() {
-//        return username;
-//    }
-//
-//    public String getObjectType() {
-//        return objectType;
-//    }
-//
-//    public String getSortType() {
-//        return sortType;
-//    }
-//
-//    public String getCriteria() {
-//        return criteria;
-//    }
-//
-//    public String getTitle() {
-//        return title;
-//    }
-//
-//    public String getGenre() {
-//        return genre;
-//    }
-//
-//    public int getNumber() {
-//        return number;
-//    }
-//
-//    public double getGrade() {
-//        return grade;
-//    }
-//
-//    public int getSeasonNumber() {
-//        return seasonNumber;
-//    }
-//
-//    public List<List<String>> getFilters() {
-//        return filters;
-//    }
 
     public Database getDatabase() {
         return database;

@@ -3,6 +3,7 @@ package main;
 import action.Action;
 import action.Command;
 import action.Query;
+import action.Recommendation;
 import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;
@@ -108,26 +109,26 @@ public final class Main {
         }
 
         Database database = new Database(myUsers, myActors, myMovies, myShows);
+
+
+
         ArrayList<Action> myActions = new ArrayList<>();
         for (ActionInputData action: input.getCommands()) {
             if (action.getActionType().equals("command")) {
                 myActions.add(new Command(action, database, fileWriter, arrayResult));
             } else if (action.getActionType().equals("query")) {
                 myActions.add(new Query(action, database, fileWriter, arrayResult));
+            } else if (action.getActionType().equals("recommendation")) {
+                myActions.add(new Recommendation(action, database, fileWriter, arrayResult));
             }
         }
 
         for (Action action: myActions) {
+//            System.out.println("------BEGIN ACTION----");
             action.execute(action.getType());
+//            System.out.println("------END ACTION-----");
         }
 
-//        System.out.println(myUsers);
-
-//        List<ActionInputData> actions = input.getCommands();
-//        List<UserInputData> users = input.getUsers();
-//        List<SerialInputData> shows = input.getSerials();
-//        List<MovieInputData> movies = input.getMovies();
-//        List<ActorInputData> actors = input.getActors();
 
         fileWriter.closeJSON(arrayResult);
     }
