@@ -19,152 +19,139 @@ import java.util.List;
 import static java.lang.Math.min;
 
 public class Query extends Action {
-	private int number;
-	private String sortType;
-	private String criteria;
-	private List<List<String>> filters;
+    private int number;
+    private String sortType;
+    private String criteria;
+    private List<List<String>> filters;
 
-	public Query(final ActionInputData action, final Database database,
-				 final Writer output, final JSONArray arrayResult) {
-		super(action, database, output, arrayResult);
-		setType(action.getObjectType());
-		number = action.getNumber();
-		sortType = action.getSortType();
-		criteria = action.getCriteria();
-		filters = action.getFilters();
-	}
+    public Query(final ActionInputData action, final Database database,
+                 final Writer output, final JSONArray arrayResult) {
+        super(action, database, output, arrayResult);
+        setType(action.getObjectType());
+        number = action.getNumber();
+        sortType = action.getSortType();
+        criteria = action.getCriteria();
+        filters = action.getFilters();
+    }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+    /**
+     * @param sortedUsers: list of filtered and/or sorted users
+     */
+    public void getUsers(final ArrayList<User> sortedUsers) {
+        ArrayList<String> queriedUsers = new ArrayList<>();
+        sortedUsers.removeIf(s -> s.getNumberOfRatings() == 0);
 
-	public void setFilters(List<List<String>> filters) {
-		this.filters = filters;
-	}
+        number = min(number, sortedUsers.size());
+        for (int i = 0; i < number; i++) {
+            queriedUsers.add(sortedUsers.get(i).getUsername());
 
-	public void sortUsers(final ArrayList<User> sortedUsers) {
-		ArrayList<String> queriedUsers = new ArrayList<>();
-		sortedUsers.removeIf(s -> s.getNumberOfRatings() == 0);
+        }
+        setMessage(getMessage() + queriedUsers);
+        writeOutput();
+    }
 
-		number = min(number, sortedUsers.size());
-		for (int i = 0; i < number; i++) {
-			queriedUsers.add(sortedUsers.get(i).getUsername());
+    /**
+     * @param sortedMovies: list of filtered and/or sorted movies
+     */
+    public void getMovies(final ArrayList<Movie> sortedMovies) {
+        ArrayList<String> queriedMovies = new ArrayList<>();
+        number = min(number, sortedMovies.size());
 
-		}
-		message = message + queriedUsers;
-		writeOutput();
-	}
+        for (int i = 0; i < number; i++) {
+            queriedMovies.add(sortedMovies.get(i).getTitle());
+        }
+        setMessage(getMessage() + queriedMovies);
+        writeOutput();
+    }
 
-	public void sortMovies(final ArrayList<Movie> sortedMovies,
-						   final String criteria) {
-		switch (criteria) {
-			case "ratings" -> sortedMovies.removeIf(s -> s.getGrade() == 0);
-			case "favorite" -> sortedMovies.removeIf(s -> s.getFavCount() == 0);
-			case "most_viewed" -> sortedMovies.removeIf(
-					s -> s.getViewCount() == 0);
-		}
+    /**
+     * @param sortedShows: list of filtered and/or sorted shows
+     */
+    public void getShows(final ArrayList<Show> sortedShows) {
+        ArrayList<String> queriedShows = new ArrayList<>();
+        number = min(number, sortedShows.size());
 
-		number = min(number, sortedMovies.size());
-		ArrayList<String> queriedMovies = new ArrayList<>();
+        for (int i = 0; i < number; i++) {
+            queriedShows.add(sortedShows.get(i).getTitle());
+        }
+        setMessage(getMessage() + queriedShows);
+        writeOutput();
+    }
 
-		for (int i = 0; i < number; i++) {
-			queriedMovies.add(sortedMovies.get(i).getTitle());
-		}
-		message = message + queriedMovies;
-		writeOutput();
-	}
+    /**
+     * @param sortedActors: list of filtered and/or sorted actors
+     */
+    public void getActors(final ArrayList<Actor> sortedActors) {
+        ArrayList<String> queriedActors = new ArrayList<>();
+        number = min(number, sortedActors.size());
 
-	public void sortShows(ArrayList<Show> sortedShows, String criteria) {
-		ArrayList<String> queriedShows = new ArrayList<>();
+        for (int i = 0; i < number; i++) {
+            queriedActors.add(sortedActors.get(i).getName());
+        }
+        setMessage(getMessage() + queriedActors);
+        writeOutput();
+    }
 
-		if ("ratings".equals(criteria)) {
-			sortedShows.removeIf(s -> s.getGrade() == 0);
-		} else if ("favorite".equals(criteria)) {
-			sortedShows.removeIf(s -> s.getFavCount() == 0);
-		} else if ("most_viewed".equals(criteria)) {
-			sortedShows.removeIf(s -> s.getViewCount() == 0);
-		}
+    /**
+     * perform queries on: users, actors or videos
+     */
+    @Override
+    public void execute() {
+        setMessage("Query result: ");
 
-		number = min(number, sortedShows.size());
+        if (getType().equals("users")) {
+            FilterUsers filterUsers = new FilterUsers(getDatabase());
+            getUsers(filterUsers.getUsersByRating(sortType));
+        } else if (getType().equals("actors")) {
+            FilterActors filterActors = new FilterActors(getDatabase());
+            switch (criteria) {
+                case "average" -> getActors(
+                        filterActors.getActorsByAvg(sortType));
+                case "awards" -> getActors(
+                        filterActors.getActorsByAwards(filters, sortType));
+                case "filter_description" -> getActors(
+                        filterActors.getActorsByKeywords(filters, sortType));
+                default -> System.out.println("Wrong input");
+            }
+        } else {
+            FilterMovie filterMovie = new FilterMovie(getDatabase());
+            FilterShow filterShow = new FilterShow(getDatabase());
+            switch (criteria) {
+                case "ratings" -> {
+                    filterMovie.getVideoByRating(filters, sortType);
+                    filterMovie.getFilteredMovies().
+                            removeIf(s -> s.getGrade() == 0);
+                    filterShow.getVideoByRating(filters, sortType);
+                    filterShow.getFilteredShows().
+                            removeIf(s -> s.getGrade() == 0);
+                }
+                case "favorite" -> {
+                    filterMovie.getFavouriteVideo(filters, sortType, "");
+                    filterMovie.getFilteredMovies().
+                            removeIf(s -> s.getFavCount() == 0);
+                    filterShow.getFavouriteVideo(filters, sortType, "");
+                    filterShow.getFilteredShows().
+                            removeIf(s -> s.getFavCount() == 0);
+                }
+                case "longest" -> {
+                    filterMovie.getLongestVideo(filters, sortType);
+                    filterShow.getLongestVideo(filters, sortType);
+                }
+                default -> {
+                    filterMovie.getMostViewedVideo(filters, sortType);
+                    filterMovie.getFilteredMovies().
+                            removeIf(s -> s.getViewCount() == 0);
+                    filterShow.getMostViewedVideo(filters, sortType);
+                    filterShow.getFilteredShows().
+                            removeIf(s -> s.getViewCount() == 0);
+                }
+            }
 
-		for (int i = 0; i < number; i++) {
-			queriedShows.add(sortedShows.get(i).getTitle());
-		}
-		message = message + queriedShows;
-		writeOutput();
-	}
-
-	public void getActors(ArrayList<Actor> sortedActors) {
-		ArrayList<String> queriedActors = new ArrayList<>();
-		number = min(number, sortedActors.size());
-
-		for (int i = 0; i < getNumber(); i++) {
-			queriedActors.add(sortedActors.get(i).getName());
-		}
-		message = message + queriedActors;
-		writeOutput();
-	}
-
-	@Override
-	public void execute(String type) {
-		message = "Query result: ";
-
-		if ("users".equals(type)) {
-			FilterUsers filterUsers = new FilterUsers(getDatabase());
-			sortUsers(filterUsers.getUsersByRating(sortType));
-		} else if ("actors".equals(type)) {
-			FilterActors filterActors = new FilterActors(getDatabase());
-			switch (criteria) {
-				case "average" -> getActors(
-						filterActors.getActorsByAvg(sortType));
-				case "awards" -> getActors(
-						filterActors.getActorsByAwards(filters, sortType));
-				case "filter_description" -> getActors(
-						filterActors.getActorsByKeywords(filters, sortType));
-			}
-		} else {
-			FilterMovie filterMovie = new FilterMovie(getDatabase());
-			FilterShow filterShow = new FilterShow(getDatabase());
-			switch (criteria) {
-				case "ratings" -> {
-					filterMovie.getVideoByRating(filters, sortType);
-					filterShow.getVideoByRating(filters, sortType);
-				}
-				case "favorite" -> {
-					filterMovie.getFavouriteVideo(filters, sortType, "");
-					filterShow.getFavouriteVideo(filters, sortType, "");
-				}
-				case "longest" -> {
-					filterMovie.getLongestVideo(filters, sortType);
-					filterShow.getLongestVideo(filters, sortType);
-				}
-				default -> {
-					filterMovie.getMostViewedVideo(filters, sortType);
-					filterShow.getMostViewedVideo(filters, sortType);
-				}
-			}
-
-			if (type.equals("movies")) {
-				sortMovies(filterMovie.getFilteredMovies(), criteria);
-			} else {
-				sortShows(filterShow.getFilteredShows(), criteria);
-			}
-		}
-	}
-
-	public int getNumber() {
-		return number;
-	}
-
-	public String getSortType() {
-		return sortType;
-	}
-
-	public String getCriteria() {
-		return criteria;
-	}
-
-	public List<List<String>> getFilters() {
-		return filters;
-	}
+            if (getType().equals("movies")) {
+                getMovies(filterMovie.getFilteredMovies());
+            } else {
+                getShows(filterShow.getFilteredShows());
+            }
+        }
+    }
 }

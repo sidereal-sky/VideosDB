@@ -13,7 +13,7 @@ public abstract class Video {
     private Integer favCount;
     private Integer viewCount;
 
-    public Video(ShowInput video) {
+    public Video(final ShowInput video) {
         this.title = video.getTitle();
         this.year = video.getYear();
         this.genres = video.getGenres();
@@ -23,60 +23,87 @@ public abstract class Video {
         viewCount = 0;
     }
 
-
+    /**
+     * @return video's title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * @return year the video was released
+     */
     public Integer getYear() {
         return year;
     }
 
+    /**
+     * @return list of genres
+     */
     public ArrayList<String> getGenres() {
         return genres;
     }
 
+    /**
+     * @return list of actors that play in the video
+     */
     public ArrayList<String> getCast() {
         return cast;
     }
 
+    /**
+     * @return average grade based on user rating
+     */
     public Double getGrade() {
         calculateRating();
         return grade;
     }
 
-    public void setGrade(Double grade) {
+    /**
+     * @param grade: new grade
+     */
+    public void setGrade(final Double grade) {
         this.grade = grade;
     }
 
+    /**
+     * @return times the video has appeared in users' favorite list
+     */
     public Integer getFavCount() {
         return favCount;
     }
 
-    public void setFavCount(Integer favCount) {
+    /**
+     * @param favCount: new count
+     */
+    public void setFavCount(final Integer favCount) {
         this.favCount = favCount;
     }
 
+    /**
+     * @return times the video has been viewed
+     */
     public Integer getViewCount() {
         return viewCount;
     }
 
-    public void setViewCount(Integer viewCount) {
+    /**
+     * @param viewCount: new count
+     */
+    public void setViewCount(final Integer viewCount) {
         this.viewCount = viewCount;
     }
 
+    /**
+     * calculate video rating
+     */
     public void calculateRating() {
 
     }
 
-    public void calculateFavCount() {
-
-    }
-
-    public void calculateViewCount() {
-
-    }
-
+    /**
+     * @return modify genre name to match operation filters
+     */
     public ArrayList<String> formattedGenres() {
         ArrayList<String> formatted = new ArrayList<>();
 
@@ -88,15 +115,5 @@ public abstract class Video {
             formatted.add(genre);
         }
         return formatted;
-    }
-
-    @Override
-    public String toString() {
-        return "Video{" +
-                "title='" + title + '\'' +
-                ", year=" + year +
-                ", genres=" + genres +
-                ", cast=" + cast +
-                '}';
     }
 }

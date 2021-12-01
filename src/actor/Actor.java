@@ -12,7 +12,7 @@ public class Actor {
     private Map<ActorsAwards, Integer> awards;
     private Double average;
 
-    public Actor(ActorInputData actor) {
+    public Actor(final ActorInputData actor) {
         this.name = actor.getName();
         this.careerDescription = actor.getCareerDescription();
         this.filmography = actor.getFilmography();
@@ -20,43 +20,56 @@ public class Actor {
         average = 0.0;
     }
 
+    /**
+     * @return actor's name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return actor's career description
+     */
     public String getCareerDescription() {
         return careerDescription;
     }
 
+    /**
+     * @return videos the actor played in
+     */
     public ArrayList<String> getFilmography() {
         return filmography;
     }
 
+    /**
+     * @return awards and number of times the actor won them
+     */
     public Map<ActorsAwards, Integer> getAwards() {
         return awards;
     }
 
+    /**
+     * @return actor's average based on their videos' rating
+     */
     public Double getAverage() {
         return average;
     }
 
-    public void setAverage(Double average) {
+    /**
+     * @param average: new average
+     */
+    public void setAverage(final Double average) {
         this.average = average;
     }
 
+    /**
+     * @return number of awards won by the actor
+     */
     public Integer awardCount() {
         Integer count = 0;
         for (Integer value: awards.values()) {
             count += value;
         }
         return count;
-    }
-
-    @Override
-    public String toString() {
-        return "Actor{" +
-                "name='" + name + '\'' +
-                ", average=" + average +
-                '}';
     }
 }

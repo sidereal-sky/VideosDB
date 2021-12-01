@@ -8,20 +8,29 @@ public class Movie extends Video {
     private ArrayList<Double> ratings;
     private Integer duration;
 
-    public Movie(MovieInputData input) {
+    public Movie(final MovieInputData input) {
         super(input);
         duration = input.getDuration();
         ratings = new ArrayList<>();
     }
 
+    /**
+     * @return video's list of grades
+     */
     public ArrayList<Double> getRatings() {
         return ratings;
     }
 
+    /**
+     * @return video's duration
+     */
     public Integer getDuration() {
         return duration;
     }
 
+    /**
+     * calculate average grade
+     */
     @Override
     public void calculateRating() {
         if (ratings.size() == 0) {
@@ -32,19 +41,6 @@ public class Movie extends Video {
         for (Double grade: ratings) {
             sum += grade;
         }
-//        System.out.println(sum/ratings.size());
-        setGrade(sum/ratings.size());
-    }
-
-
-    @Override
-    public String toString() {
-        return "Movie{" +
-                "title=" + getTitle() +
-                " genres=" + getGenres() +
-                " ratings=" + ratings +
-                " grade=" + getGrade() +
-                ", viewCount=" + getViewCount() +
-                '}';
+        setGrade(sum / ratings.size());
     }
 }

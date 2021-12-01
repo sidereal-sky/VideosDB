@@ -9,23 +9,25 @@ public class Show extends Video {
     private ArrayList<Season> seasons;
 
 
-    public Show(SerialInputData input) {
+    public Show(final SerialInputData input) {
         super(input);
         seasons = input.getSeasons();
         numberOfSeasons = input.getNumberSeason();
     }
 
-    public Integer getNumberOfSeasons() {
-        return numberOfSeasons;
-    }
-
+    /**
+     * @return list of seasons
+     */
     public ArrayList<Season> getSeasons() {
         return seasons;
     }
 
+    /**
+     * calculate show's average grade
+     */
     public void calculateRating() {
         double sum = 0.0;
-        for (Season season: getSeasons()) {
+        for (Season season: seasons) {
             Double seasonSum = 0.0;
             for (Double rating: season.getRatings()) {
                 seasonSum += rating;
@@ -34,25 +36,17 @@ public class Show extends Video {
                 sum += seasonSum / season.getRatings().size();
             }
         }
-        setGrade(sum/numberOfSeasons);
+        setGrade(sum / numberOfSeasons);
     }
 
+    /**
+     * @return calculate show's duration
+     */
     public Integer calculateDuration() {
         int duration = 0;
-        for(Season season: getSeasons()) {
+        for (Season season: seasons) {
             duration += season.getDuration();
         }
         return duration;
-    }
-
-    @Override
-    public String toString() {
-        return "Show{" +
-                "title=" + getTitle() +
-                " genres=" + getGenres() +
-                " rating=" + getGrade() +
-                " viewCount=" + getViewCount() +
-                " favCount=" + getFavCount() +
-                '}';
     }
 }

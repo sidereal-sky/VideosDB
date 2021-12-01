@@ -19,7 +19,6 @@ import fileio.MovieInputData;
 import fileio.SerialInputData;
 import fileio.UserInputData;
 import fileio.Writer;
-import org.checkerframework.checker.units.qual.A;
 import org.json.simple.JSONArray;
 import user.User;
 
@@ -29,7 +28,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -113,19 +111,20 @@ public final class Main {
 
         ArrayList<Action> myActions = new ArrayList<>();
         for (ActionInputData action: input.getCommands()) {
-            if (action.getActionType().equals("command")) {
-                myActions.add(new Command(action, database, fileWriter, arrayResult));
-            } else if (action.getActionType().equals("query")) {
-                myActions.add(new Query(action, database, fileWriter, arrayResult));
-            } else if (action.getActionType().equals("recommendation")) {
-                myActions.add(new Recommendation(action, database, fileWriter, arrayResult));
+            switch (action.getActionType()) {
+                case "command" -> myActions.add(
+                        new Command(action, database, fileWriter, arrayResult));
+                case "query" -> myActions.add(
+                        new Query(action, database, fileWriter, arrayResult));
+                case "recommendation" -> myActions.add(
+                        new Recommendation(action, database, fileWriter,
+                                arrayResult));
+                default -> System.out.println("Wrong input");
             }
         }
 
         for (Action action: myActions) {
-//            System.out.println("------BEGIN ACTION----");
-            action.execute(action.getType());
-//            System.out.println("------END ACTION-----");
+            action.execute();
         }
 
 
