@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FilterMovie extends FilterVideo {
+public class FilterMovies extends FilterVideos {
 
-    public FilterMovie(final Database database) {
+    public FilterMovies(final Database database) {
         super(database);
     }
 

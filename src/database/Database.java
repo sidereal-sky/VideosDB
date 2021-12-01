@@ -57,7 +57,7 @@ public class Database {
 
     /**
      * @param username: username
-     * @return the user with username from the db
+     * @return the user with the given username from the db
      */
     public User findUser(final String username) {
         for (User user: myUsers) {
@@ -70,7 +70,7 @@ public class Database {
 
     /**
      * @param videoTitle: movie title
-     * @return the movie with videoTitle from the db
+     * @return the movie with the given title from the db
      */
     public Movie findMovie(final String videoTitle) {
         for (Movie movie: myMovies) {
@@ -83,7 +83,7 @@ public class Database {
 
     /**
      * @param videoTitle: show title
-     * @return the show with videoTitle from the db
+     * @return the show with the given title from the db
      */
     public Show findShow(final String videoTitle) {
         for (Show show: myShows) {

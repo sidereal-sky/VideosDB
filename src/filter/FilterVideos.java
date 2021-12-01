@@ -7,11 +7,11 @@ import entertainment.Show;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FilterVideo extends Filter {
+public abstract class FilterVideos extends Filter {
     private ArrayList<Movie> filteredMovies;
     private ArrayList<Show> filteredShows;
 
-    public FilterVideo(final Database database) {
+    public FilterVideos(final Database database) {
         super(database);
         filteredMovies = new ArrayList<>();
         filteredShows = new ArrayList<>();

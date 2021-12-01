@@ -3,8 +3,8 @@ package action;
 import actor.Actor;
 import database.Database;
 import filter.FilterActors;
-import filter.FilterMovie;
-import filter.FilterShow;
+import filter.FilterMovies;
+import filter.FilterShows;
 import filter.FilterUsers;
 import entertainment.Movie;
 import entertainment.Show;
@@ -114,8 +114,8 @@ public class Query extends Action {
                 default -> System.out.println("Wrong input");
             }
         } else {
-            FilterMovie filterMovie = new FilterMovie(getDatabase());
-            FilterShow filterShow = new FilterShow(getDatabase());
+            FilterMovies filterMovie = new FilterMovies(getDatabase());
+            FilterShows filterShow = new FilterShows(getDatabase());
             switch (criteria) {
                 case "ratings" -> {
                     filterMovie.getVideoByRating(filters, sortType);

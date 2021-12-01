@@ -1,8 +1,8 @@
 package action;
 
 import database.Database;
-import filter.FilterMovie;
-import filter.FilterShow;
+import filter.FilterMovies;
+import filter.FilterShows;
 import entertainment.Movie;
 import entertainment.Show;
 import entertainment.Video;
@@ -19,16 +19,16 @@ import java.util.Map;
 public class Recommendation extends Action {
     private String username;
     private String searchGenre;
-    private FilterMovie filterMovie;
-    private FilterShow filterShow;
+    private FilterMovies filterMovie;
+    private FilterShows filterShow;
 
     public Recommendation(final ActionInputData action, final Database database,
                           final Writer output, final JSONArray arrayResult) {
         super(action, database, output, arrayResult);
         this.username = action.getUsername();
         this.searchGenre = action.getGenre();
-        filterMovie = new FilterMovie(database);
-        filterShow = new FilterShow(database);
+        filterMovie = new FilterMovies(database);
+        filterShow = new FilterShows(database);
     }
 
     /**
