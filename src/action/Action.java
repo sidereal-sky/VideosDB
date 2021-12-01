@@ -35,6 +35,44 @@ public abstract class Action {
         this.arrayResult = arrayResult;
     }
 
+    public Action(Database database, Writer output, JSONArray arrayResult) {
+        this.database = database;
+        this.output = output;
+        this.arrayResult = arrayResult;
+    }
+
+    public void setActionId(int actionId) {
+        this.actionId = actionId;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
+
+    public void setDatabase(Database database) {
+        this.database = database;
+    }
+
+    public void setOutput(Writer output) {
+        this.output = output;
+    }
+
+    public JSONArray getArrayResult() {
+        return arrayResult;
+    }
+
+    public void setArrayResult(JSONArray arrayResult) {
+        this.arrayResult = arrayResult;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public void execute(String type) {
 
     }

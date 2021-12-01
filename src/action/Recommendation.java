@@ -1,12 +1,13 @@
 package action;
 
 import database.Database;
+import filter.FilterMovie;
+import filter.FilterShow;
 import entertainment.Movie;
 import entertainment.Show;
 import entertainment.Video;
 import fileio.ActionInputData;
 import fileio.Writer;
-import org.checkerframework.checker.units.qual.C;
 import org.json.simple.JSONArray;
 import user.User;
 
@@ -19,6 +20,8 @@ import java.util.Map;
 public class Recommendation extends Action{
 	private String username;
 	private String searchGenre;
+	private FilterMovie filterMovie;
+	private FilterShow filterShow;
 
 	public Recommendation(ActionInputData action, Database database,
 						  Writer output,
@@ -26,6 +29,8 @@ public class Recommendation extends Action{
 		super(action, database, output, arrayResult);
 		this.username = action.getUsername();
 		this.searchGenre = action.getGenre();
+		filterMovie = new FilterMovie(database);
+		filterShow = new FilterShow(database);
 	}
 
 	public String getUnseenVideo(User user) {
@@ -47,13 +52,12 @@ public class Recommendation extends Action{
 		bestVideos.add(null);
 		bestVideos.add(null);
 
-		ArrayList<Movie> sortedMovies = new ArrayList<>();
-
 		if(type.equals("best_unseen")) {
-			sortedMovies = getDatabase().getMoviesByRating(new ArrayList<>(), "desc");
+			filterMovie.getVideoByRating(new ArrayList<>(), "desc");
 		} else if (type.equals("favorite")) {
-			sortedMovies = getDatabase().getFavouriteMovies(new ArrayList<>(), "desc", "recom");
+			filterMovie.getFavouriteVideo(new ArrayList<>(), "desc", "recom");
 		}
+		ArrayList<Movie> sortedMovies = filterMovie.getFilteredMovies();
 
 		for (Movie movie: sortedMovies) {
 			if (!user.getHistory().containsKey(movie.getTitle())) {
@@ -62,13 +66,12 @@ public class Recommendation extends Action{
 			}
 		}
 
-		ArrayList<Show> sortedShows = new ArrayList<>();
-
 		if (type.equals("best_unseen")) {
-			sortedShows = getDatabase().getShowsByRating(new ArrayList<>(), "desc");
+			filterShow.getVideoByRating(new ArrayList<>(), "desc");
 		} else if (type.equals("favorite")) {
-			sortedShows = getDatabase().getFavouriteShows(new ArrayList<>(), "desc", "recom");
+			filterShow.getFavouriteVideo(new ArrayList<>(), "desc", "recom");
 		}
+		ArrayList<Show> sortedShows = filterShow.getFilteredShows();
 
 		for (Show show: sortedShows) {
 			if(!user.getHistory().containsKey(show.getTitle())) {
@@ -132,8 +135,12 @@ public class Recommendation extends Action{
 		filters.add(genre);
 
 		ArrayList<String> titles = new ArrayList<>();
-		ArrayList<Movie> movies = getDatabase().getMoviesByRating(filters, "asc");
-		ArrayList<Show> shows = getDatabase().getShowsByRating(filters, "asc");
+
+		filterMovie.getVideoByRating(filters, "asc");
+		ArrayList<Movie> movies = filterMovie.getFilteredMovies();
+
+		filterShow.getVideoByRating(filters, "asc");
+		ArrayList<Show> shows = filterShow.getFilteredShows();
 
 		for (Movie movie: movies) {
 			if(!user.getHistory().containsKey(movie.getTitle())) {
@@ -170,33 +177,35 @@ public class Recommendation extends Action{
 			} else {
 				message += " result: " + getUnseenVideo(user);
 			}
-//			writeOutput();
 		} else if (type.equals("best_unseen")) {
 			if (getBestUnseenVideo(user, type) == null) {
 				message += "cannot be applied!";
 			} else {
 				message += "result: " + getBestUnseenVideo(user, type);
 			}
-//			writeOutput();
 		} else if (user.getSubscription().equals("PREMIUM")) {
-			if (type.equals("popular")) {
-				if (getPopularVideo(user) == null) {
-					message += " cannot be applied!";
-				} else {
-					message += " result: " + getPopularVideo(user);
-				}
-			} else if (type.equals("favorite")) {
-				if (getBestUnseenVideo(user, type) == null) {
-					message += " cannot be applied!";
-				} else {
-					message += " result: " + getBestUnseenVideo(user, type);
-				}
-			} else if (type.equals("search")) {
-				if (searchVideos(user).isEmpty()) {
-					message += " cannot be applied!";
-				} else {
-					message += " result: " + searchVideos(user);
-				}
+			switch (type) {
+				case "popular":
+					if (getPopularVideo(user) == null) {
+						message += " cannot be applied!";
+					} else {
+						message += " result: " + getPopularVideo(user);
+					}
+					break;
+				case "favorite":
+					if (getBestUnseenVideo(user, type) == null) {
+						message += " cannot be applied!";
+					} else {
+						message += " result: " + getBestUnseenVideo(user, type);
+					}
+					break;
+				case "search":
+					if (searchVideos(user).isEmpty()) {
+						message += " cannot be applied!";
+					} else {
+						message += " result: " + searchVideos(user);
+					}
+					break;
 			}
 		} else {
 			message += " cannot be applied!";

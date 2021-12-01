@@ -2,6 +2,10 @@ package action;
 
 import actor.Actor;
 import database.Database;
+import filter.FilterActors;
+import filter.FilterMovie;
+import filter.FilterShow;
+import filter.FilterUsers;
 import entertainment.Movie;
 import entertainment.Show;
 import fileio.ActionInputData;
@@ -28,6 +32,14 @@ public class Query extends Action {
 		sortType = action.getSortType();
 		criteria = action.getCriteria();
 		filters = action.getFilters();
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
+	public void setFilters(List<List<String>> filters) {
+		this.filters = filters;
 	}
 
 	public void sortUsers(final ArrayList<User> sortedUsers) {
@@ -82,10 +94,11 @@ public class Query extends Action {
 		writeOutput();
 	}
 
-	public void sortActors(ArrayList<Actor> sortedActors) {
+	public void getActors(ArrayList<Actor> sortedActors) {
 		ArrayList<String> queriedActors = new ArrayList<>();
 		number = min(number, sortedActors.size());
-		for (int i = 0; i < number; i++) {
+
+		for (int i = 0; i < getNumber(); i++) {
 			queriedActors.add(sortedActors.get(i).getName());
 		}
 		message = message + queriedActors;
@@ -95,42 +108,47 @@ public class Query extends Action {
 	@Override
 	public void execute(String type) {
 		message = "Query result: ";
-		switch (type) {
-			case "users":
-				sortUsers(getDatabase().getUsersByRating(sortType));
-				break;
-			case "movies":
-				switch (criteria) {
-					case "ratings" -> sortMovies(getDatabase().getMoviesByRating(filters, sortType),
-							criteria);
-					case "favorite" -> sortMovies(
-							getDatabase().getFavouriteMovies(filters, sortType, ""), criteria);
-					case "longest" -> sortMovies(
-							getDatabase().getLongestMovies(filters, sortType), criteria);
-					case "most_viewed" -> sortMovies(
-							getDatabase().getMostViewedMovies(filters, sortType), criteria);
+
+		if ("users".equals(type)) {
+			FilterUsers filterUsers = new FilterUsers(getDatabase());
+			sortUsers(filterUsers.getUsersByRating(sortType));
+		} else if ("actors".equals(type)) {
+			FilterActors filterActors = new FilterActors(getDatabase());
+			switch (criteria) {
+				case "average" -> getActors(
+						filterActors.getActorsByAvg(sortType));
+				case "awards" -> getActors(
+						filterActors.getActorsByAwards(filters, sortType));
+				case "filter_description" -> getActors(
+						filterActors.getActorsByKeywords(filters, sortType));
+			}
+		} else {
+			FilterMovie filterMovie = new FilterMovie(getDatabase());
+			FilterShow filterShow = new FilterShow(getDatabase());
+			switch (criteria) {
+				case "ratings" -> {
+					filterMovie.getVideoByRating(filters, sortType);
+					filterShow.getVideoByRating(filters, sortType);
 				}
-				break;
-			case "shows":
-				switch (criteria) {
-					case "ratings" -> sortShows(getDatabase().getShowsByRating(filters, sortType),
-							criteria);
-					case "favorite" -> sortShows(getDatabase().
-									getFavouriteShows(filters, sortType, ""), criteria);
-					case "longest" -> sortShows(getDatabase().getLongestShows(filters, sortType),
-							criteria);
-					case "most_viewed" -> sortShows(
-							getDatabase().getMostViewedShows(filters, sortType), criteria);
+				case "favorite" -> {
+					filterMovie.getFavouriteVideo(filters, sortType, "");
+					filterShow.getFavouriteVideo(filters, sortType, "");
 				}
-				break;
-			case "actors":
-				switch (criteria) {
-					case "average" -> sortActors(getDatabase().getActorsByAvg(sortType));
-					case "awards" -> sortActors(getDatabase().getActorsByAwards(filters, sortType));
-					case "filter_description" -> sortActors(
-							getDatabase().getActorsByKeywords(filters, sortType));
+				case "longest" -> {
+					filterMovie.getLongestVideo(filters, sortType);
+					filterShow.getLongestVideo(filters, sortType);
 				}
-				break;
+				default -> {
+					filterMovie.getMostViewedVideo(filters, sortType);
+					filterShow.getMostViewedVideo(filters, sortType);
+				}
+			}
+
+			if (type.equals("movies")) {
+				sortMovies(filterMovie.getFilteredMovies(), criteria);
+			} else {
+				sortShows(filterShow.getFilteredShows(), criteria);
+			}
 		}
 	}
 
