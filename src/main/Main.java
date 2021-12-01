@@ -111,7 +111,6 @@ public final class Main {
         Database database = new Database(myUsers, myActors, myMovies, myShows);
 
 
-
         ArrayList<Action> myActions = new ArrayList<>();
         for (ActionInputData action: input.getCommands()) {
             if (action.getActionType().equals("command")) {

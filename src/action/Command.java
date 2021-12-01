@@ -2,7 +2,6 @@ package action;
 
 import database.Database;
 import entertainment.Movie;
-import entertainment.Season;
 import entertainment.Show;
 import fileio.ActionInputData;
 import fileio.Writer;
@@ -10,7 +9,6 @@ import org.json.simple.JSONArray;
 import user.User;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Command extends Action {
     private String username;
@@ -53,13 +51,14 @@ public class Command extends Action {
         } else {
             user.getHistory().put(title, 1);
         }
-		if (movie != null) {
-			movie.setViewCount(movie.getViewCount() + 1);
-		} else if (show != null) {
-			show.setViewCount(show.getViewCount() + 1);
-		}
+//		if (movie != null) {
+//			movie.setViewCount(movie.getViewCount() + 1);
+//		} else if (show != null) {
+//			show.setViewCount(show.getViewCount() + 1);
+//		}
         Integer views = user.getHistory().get(title);
-        message = "success -> " + title + " was viewed with total views of " + views;
+        message = "success -> " + title + " was viewed with total views of "
+				+ views;
         writeOutput();
     }
 
@@ -111,9 +110,9 @@ public class Command extends Action {
         if (user == null) {
             return;
         }
+
 		Movie movie = getDatabase().findMovie(title);
 		Show show = getDatabase().findShow(title);
-
 
         switch (type) {
             case "favorite":
@@ -128,7 +127,6 @@ public class Command extends Action {
 						rateShow(user, show);
 					} else {
 						rateMovie(user, movie);
-//						System.out.println(movie.getTitle() + movie.getRatings() + movie.CalculateRating());
 					}
 				}
                 break;

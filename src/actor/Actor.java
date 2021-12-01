@@ -44,7 +44,7 @@ public class Actor {
         this.average = average;
     }
 
-    public Integer calculateAwardCount() {
+    public Integer awardCount() {
         Integer count = 0;
         for (Integer value: awards.values()) {
             count += value;
@@ -56,6 +56,7 @@ public class Actor {
     public String toString() {
         return "Actor{" +
                 "name='" + name + '\'' +
+                ", average=" + average +
                 '}';
     }
 }

@@ -14,14 +14,14 @@ import java.util.List;
 
 import static java.lang.Math.min;
 
-public class Query extends Action{
+public class Query extends Action {
 	private int number;
 	private String sortType;
 	private String criteria;
 	private List<List<String>> filters;
 
-	public Query(ActionInputData action, Database database, Writer output,
-				 JSONArray arrayResult) {
+	public Query(final ActionInputData action, final Database database,
+				 final Writer output, final JSONArray arrayResult) {
 		super(action, database, output, arrayResult);
 		setType(action.getObjectType());
 		number = action.getNumber();
@@ -30,7 +30,7 @@ public class Query extends Action{
 		filters = action.getFilters();
 	}
 
-	public void sortUsers(ArrayList<User> sortedUsers) {
+	public void sortUsers(final ArrayList<User> sortedUsers) {
 		ArrayList<String> queriedUsers = new ArrayList<>();
 		sortedUsers.removeIf(s -> s.getNumberOfRatings() == 0);
 
@@ -43,21 +43,18 @@ public class Query extends Action{
 		writeOutput();
 	}
 
-	public void sortMovies(ArrayList<Movie> sortedMovies, String criteria) {
-//		System.out.println("-------START PRINT-------");
-//		System.out.println(sortedVideos);
-//		System.out.println("-------END PRINT-----");
-		ArrayList<String> queriedMovies = new ArrayList<>();
-
-		if ("ratings".equals(criteria)) {
-			sortedMovies.removeIf(s -> s.calculateRating() == 0);
-		} else if ("favorite".equals(criteria)) {
-			sortedMovies.removeIf(s -> s.getFavCount() == 0);
-		} else if ("most_viewed".equals(criteria)) {
-			sortedMovies.removeIf(s -> s.getViewCount() == 0);
+	public void sortMovies(final ArrayList<Movie> sortedMovies,
+						   final String criteria) {
+		switch (criteria) {
+			case "ratings" -> sortedMovies.removeIf(s -> s.getGrade() == 0);
+			case "favorite" -> sortedMovies.removeIf(s -> s.getFavCount() == 0);
+			case "most_viewed" -> sortedMovies.removeIf(
+					s -> s.getViewCount() == 0);
 		}
 
 		number = min(number, sortedMovies.size());
+		ArrayList<String> queriedMovies = new ArrayList<>();
+
 		for (int i = 0; i < number; i++) {
 			queriedMovies.add(sortedMovies.get(i).getTitle());
 		}
@@ -68,10 +65,12 @@ public class Query extends Action{
 	public void sortShows(ArrayList<Show> sortedShows, String criteria) {
 		ArrayList<String> queriedShows = new ArrayList<>();
 
-		switch (criteria) {
-			case "ratings" -> sortedShows.removeIf(s -> s.calculateRating() == 0);
-			case "favorite" -> sortedShows.removeIf(s -> s.getFavCount() == 0);
-			case "most_viewed" -> sortedShows.removeIf(s -> s.getViewCount() == 0);
+		if ("ratings".equals(criteria)) {
+			sortedShows.removeIf(s -> s.getGrade() == 0);
+		} else if ("favorite".equals(criteria)) {
+			sortedShows.removeIf(s -> s.getFavCount() == 0);
+		} else if ("most_viewed".equals(criteria)) {
+			sortedShows.removeIf(s -> s.getViewCount() == 0);
 		}
 
 		number = min(number, sortedShows.size());
@@ -105,7 +104,7 @@ public class Query extends Action{
 					case "ratings" -> sortMovies(getDatabase().getMoviesByRating(filters, sortType),
 							criteria);
 					case "favorite" -> sortMovies(
-							getDatabase().getFavouriteMovies(filters, sortType), criteria);
+							getDatabase().getFavouriteMovies(filters, sortType, ""), criteria);
 					case "longest" -> sortMovies(
 							getDatabase().getLongestMovies(filters, sortType), criteria);
 					case "most_viewed" -> sortMovies(
@@ -116,8 +115,8 @@ public class Query extends Action{
 				switch (criteria) {
 					case "ratings" -> sortShows(getDatabase().getShowsByRating(filters, sortType),
 							criteria);
-					case "favorite" -> sortShows(getDatabase().getFavouriteShows(filters, sortType),
-							criteria);
+					case "favorite" -> sortShows(getDatabase().
+									getFavouriteShows(filters, sortType, ""), criteria);
 					case "longest" -> sortShows(getDatabase().getLongestShows(filters, sortType),
 							criteria);
 					case "most_viewed" -> sortShows(
