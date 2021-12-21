@@ -1,18 +1,33 @@
 package main;
 
+import action.Action;
+import action.Command;
+import action.Query;
+import action.Recommendation;
+import actor.Actor;
 import checker.Checkstyle;
 import checker.Checker;
 import common.Constants;
+import database.Database;
+import entertainment.Movie;
+import entertainment.Show;
+import fileio.ActionInputData;
+import fileio.ActorInputData;
 import fileio.Input;
 import fileio.InputLoader;
+import fileio.MovieInputData;
+import fileio.SerialInputData;
+import fileio.UserInputData;
 import fileio.Writer;
 import org.json.simple.JSONArray;
+import user.User;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -71,6 +86,46 @@ public final class Main {
         JSONArray arrayResult = new JSONArray();
 
         //TODO add here the entry point to your implementation
+        ArrayList<User> myUsers = new ArrayList<>();
+        for (UserInputData user: input.getUsers()) {
+            myUsers.add(new User(user));
+        }
+
+        ArrayList<Movie> myMovies = new ArrayList<>();
+        for (MovieInputData movie: input.getMovies()) {
+            myMovies.add(new Movie(movie));
+        }
+
+        ArrayList<Show> myShows = new ArrayList<>();
+        for (SerialInputData show: input.getSerials()) {
+            myShows.add(new Show(show));
+        }
+
+        ArrayList<Actor> myActors = new ArrayList<>();
+        for (ActorInputData actor: input.getActors()) {
+            myActors.add(new Actor(actor));
+        }
+
+        Database database = new Database(myUsers, myActors, myMovies, myShows);
+
+        ArrayList<Action> myActions = new ArrayList<>();
+        for (ActionInputData action: input.getCommands()) {
+            switch (action.getActionType()) {
+                case "command" -> myActions.add(
+                        new Command(action, database, fileWriter, arrayResult));
+                case "query" -> myActions.add(
+                        new Query(action, database, fileWriter, arrayResult));
+                case "recommendation" -> myActions.add(
+                        new Recommendation(action, database, fileWriter,
+                                arrayResult));
+                default -> System.out.println("Wrong input");
+            }
+        }
+
+        for (Action action: myActions) {
+            action.execute();
+        }
+
 
         fileWriter.closeJSON(arrayResult);
     }
