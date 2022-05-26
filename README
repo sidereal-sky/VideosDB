@@ -57,14 +57,3 @@ Implementation:
             * favorite: first favorite video they haven't watched
             * search: display best rated videos of a given genre they haven't
             watched
-
-Sidenotes:
-    - OOP design pattern-wise, I know this implementation is weak and I'm sorry
-    for that; I would've researched more on singleton, visitor etc. if I
-    started the homework earlier
-    - if you have any recommendations regarding that, please let me know (on
-    vmchecker or wherever you'd like), it would help me get a better grasp of
-    recognizing design patterns
-    - although this homework's main idea was really cool, it was so ambiguous;
-    it took me a day to figure out what I actually need to do
-    - lastly, I hope my implementation doesn't tilt you too much
